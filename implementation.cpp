@@ -6,6 +6,7 @@
 #include <random>
 #include <ctime>
 #include <cstdlib>
+#include <bits/stdc++.h> 
 using namespace std;
 
 #include "implementation.h"
@@ -97,7 +98,7 @@ vector<part> getPartData(string fileName){
   for(int i=0; i < rawData.size(); i+=5){
     part p;
 
-    p.code = rawData[i];
+    p.code = rawData[i][0];
     p.name = rawData[i+1];
     p.min = stoi(rawData[i+2]);
     p.max = stoi(rawData[i+3]);
@@ -114,4 +115,20 @@ int genRandomNo(){
   // default_random_engine randEngine(time(0));
   // return uniform(randEngine);
   return rand();
+}
+
+int genRobotComplexity(string robotParts, vector<part> allParts){
+  int partComplexity = 0;
+
+  for(auto p : robotParts){
+    vector<part>::iterator i = std::find_if(allParts.begin(), allParts.end(), [p](part const& part){
+      return part.code == p;
+    });
+    if(i != allParts.end())
+      partComplexity += i -> complexity;
+    else
+      cout << "part not found" << endl;
+  }
+
+  return 20 + partComplexity;
 }

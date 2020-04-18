@@ -1,11 +1,5 @@
 #include <iostream>
-#include <iomanip>
 #include <string>
-// #include <map>
-// #include <random>
-// #include <ctime>
-// #include <fstream>
-// #include <sstream>
 #include <vector>
 using namespace std;
 #include "implementation.h"
@@ -14,9 +8,10 @@ using namespace std;
 int main() {
 
   cout << endl << "=== CUSTOMER DATA ===" << endl;
-  vector<customer> customers = getCustomerData("Customer.txt");
+  vector<customer> customers = getCustomerData("Customers.txt");
   for(auto c:customers)
     cout << c.name << " " << c.order << " " << c.parts << endl;
+
 
   cout << endl << "=== BUILDER DATA ===" << endl;
   vector<builder> builders = getBuilderData("Builders.txt");
@@ -29,6 +24,9 @@ int main() {
     cout << p.code << "  " << p.name << "  " << p.min << "  " << p.max << "  " << p.complexity << endl;
 
   cout << endl << "random no: " << genRandomNo() << endl;
+
+  int robotComplexity = genRobotComplexity(customers[3].parts, parts);
+  cout << "Robot complexity: " << robotComplexity << endl;
 
   return 0;
 }

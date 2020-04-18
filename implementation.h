@@ -9,7 +9,7 @@ struct builder{
   int variability;
 };
 struct part{
-  string code;
+  char code;
   string name;
   int min;
   int max;
@@ -21,3 +21,4 @@ vector<customer> getCustomerData(string fileName);
 vector<builder> getBuilderData(string fileName);
 vector<part> getPartData(string fileName);
 int genRandomNo();
+int genRobotComplexity(string robotParts, vector<part> allParts);
