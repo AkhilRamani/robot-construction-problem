@@ -1,5 +1,4 @@
-Sols username: anr997
-
+Robot As Toy assignment 1 excercise at University of Wollongong.
 Below are the commands for compilation and run of a program
 
 compilation:
