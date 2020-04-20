@@ -1,0 +1,51 @@
+Processing customer: Carly
+Order: Cat
+Builder assigned: Sloppy Simon
+Overall robot variability: 16
+Overall robot complexity: 66
+Normal random value: 33
+build failed
+attempting the build second time
+Normal random value: 56
+build failed
+attempting the build third time
+Normal random value: 13
+build failed
+-----
+
+Processing customer: Dodgy Dan
+Order: Dog
+Builder assigned: Sloppy Simon
+Overall robot variability: 16
+Overall robot complexity: 66
+Normal random value: 5
+build failed
+attempting the build second time
+Normal random value: 39
+build failed
+attempting the build third time
+Normal random value: 8
+build failed
+-----
+
+Processing customer: Ernie
+Order: Ettin
+Builder assigned: Technical Tom
+Overall robot variability: 15
+Overall robot complexity: 83
+Normal random value: 68
+build failed
+attempting the build second time
+Normal random value: 86
+build successful
+-----
+
+Processing customer: Sally
+Order: Snake
+Builder assigned: Reliable Rover
+Overall robot variability: 13
+Overall robot complexity: 47
+Normal random value: 88
+build successful
+-----
+

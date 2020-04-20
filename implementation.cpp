@@ -10,42 +10,57 @@
 using namespace std;
 #include "implementation.h"
 
-vector<string> readFile(string fileName){
+//print data on console as well as write on file
+void printAndWrite(string s, ofstream &outfile){
+  cout << s << endl;
+  outfile << s << endl;
+}
+
+//reads the file and returns an array of string, which devided by ":"
+vector<string> readFile(string fileName, int dataNeedPerRecord){
   ifstream inputFile;
   vector<string> fileData;
   inputFile.open(fileName);
 
-  //reading the input file
-  if(inputFile.fail()) cerr << " failed to open" << fileName << endl;   //displays the file opening error
+  //validate the file opening error
+  if(inputFile.fail()){
+    cerr << "\nexception: failed to open" << fileName << endl << endl;
+    exit(0);
+  }
 
+  //reading the input file
   while(inputFile){
     string line;
 
     if(!getline(inputFile, line)) break;
 
     int idx = line.find(".");
-    if(idx != -1) line = line.substr(0, idx);                 //removes the "." from the end of a line
+    if(idx != -1) line = line.substr(0, idx);              //removes the "." from the end of a line
 
     istringstream lineStream(line);
 
+    int dataCount = 0;
     while (lineStream){
       string subString;
-      if(!getline(lineStream, subString, ':')) break;         //breaking the string by ":"
+      if(!getline(lineStream, subString, ':')) break;      //breaking the string by ":"
       fileData.push_back(subString);
+      dataCount++;
+    }
+
+    if(dataCount != dataNeedPerRecord){                    //checks required data supplied or not
+      cerr << endl << "exception: " << fileName << " not formatted properly. It requires " << dataNeedPerRecord << " data per record.\n" << endl;
+      exit (0);
     }
   }
+
   inputFile.close();
 
-  return fileData;                                            //returns the string vector
+  return fileData;                                         //returns the string vector
 }
 
-// void writeFile(){
-//   ofstream outFile;
-//   outFile.open();
-// }
-
+//format and fill customers data in vector of customer struct
 vector<customer> getCustomerData(string fileName){
-  vector<string> rawData = readFile(fileName);
+  vector<string> rawData = readFile(fileName, 3);
   vector<customer> formattedData;
 
   for(int i = 0; i < rawData.size(); i+=3){
@@ -58,18 +73,19 @@ vector<customer> getCustomerData(string fileName){
     formattedData.push_back(c);
   }
 
-  cout << endl << "\t== CUSTOMER DATA ====" << endl;
+  cout << endl << "\tCUSTOMER DATA" << "\n\t-------------" << endl;
   for(auto c:formattedData)
-    cout << "\t" << c.name << ",  " << c.order << ",  " << c.parts << endl;
+    cout << "\tName: " << c.name << ",  Order: " << c.order << ",  Parts: " << c.parts << endl;
 
   return formattedData;
 }
 
-vector<builder> getBuilderData(string fileName){              //function returns vector of builders
-  vector<string> rawData = readFile(fileName);                //reads data from file and returns array
+//format and fill builders data in vector of builder struct
+vector<builder> getBuilderData(string fileName){           //function returns vector of builders
+  vector<string> rawData = readFile(fileName, 3);          //reads data from file and returns array
   vector<builder> formattedData;  
 
-  for(int i = 0; i < rawData.size(); i+=3){                   //ctrates a vector of builder struct
+  for(int i = 0; i < rawData.size(); i+=3){                //ctrates a vector of builder struct
     builder b;
 
     b.name = rawData[i];
@@ -79,15 +95,16 @@ vector<builder> getBuilderData(string fileName){              //function returns
     formattedData.push_back(b);
   }
 
-  cout << endl << "\t== BUILDER DATA ====" << endl;
+  cout << endl << "\tBUILDER DATA" << "\n\t------------" << endl;
   for(auto b: formattedData)
-    cout << "\t" << b.name << ",  " << b.ability << ",  " << b.variability << endl;
+    cout << "\tName: " << b.name << ",  Ability: " << b.ability << ",  Variability: " << b.variability << endl;
 
   return formattedData;
 }
 
+//format and fill parts data in vector of part struct
 vector<part> getPartData(string fileName){
-  vector<string> rawData = readFile(fileName);
+  vector<string> rawData = readFile(fileName, 5);
   vector<part> formattedData;
 
   for(int i=0; i < rawData.size(); i+=5){
@@ -102,26 +119,27 @@ vector<part> getPartData(string fileName){
     formattedData.push_back(p);
   }
 
-  cout << endl << "\t== PARTS DATA ====" << endl;
+  cout << endl << "\tPARTS DATA" << "\n\t----------" << endl;
   for(auto p:formattedData)
-    cout << "\t" << p.code << ",  " << p.name << ",  " << p.min << ",  " << p.max << ",  " << p.complexity << endl;
+    cout << "\tCode: " << p.code << ",  Name: " << p.name << ",  Minimum: " << p.min << ",  Maximum: " << p.max << ",  Complexity: " << p.complexity << endl;
 
   return formattedData;
 }
 
-
+//generates random number between 0 and 2
 int genRandomNo(){
   random_device device;
   mt19937 gen(device());
   uniform_int_distribution<> uniform(0, 2);
   return uniform(gen);
-  // return rand()%10;
 }
 
 int genRobotComplexity(string robotParts, vector<part> allParts){
   int partComplexity = 0;
 
   for(auto p : robotParts){
+
+    //iterates over parts vector and returns part struct, which code matchs with the variable "p"
     vector<part>::iterator i = std::find_if(allParts.begin(), allParts.end(), [p](part const& part){
       return part.code == p;
     });
@@ -139,47 +157,45 @@ int genRobotVariablity(string robotParts, int builderVariability){
   return 5 + robotParts.length() + builderVariability;
 }
 
+//generates a random value by normal distribution
 int genNormalRandomValue(int builderAbility, int robotVariability){
   default_random_engine randEngine(rand());
   normal_distribution<double> normal(builderAbility, robotVariability);
-
   return normal(randEngine);
 }
 
+//fun returns true if build success, else returns flase
 bool isBuildSuccessful(int randomValue, int robotComplexity){
   return randomValue >= robotComplexity ? true : false;
 }
 
-void build(builder b, customer c, vector<part> parts){
+//actual build logic for building robot
+void build(builder b, customer c, vector<part> parts, ofstream &outfile){
   int robotVariability = genRobotVariablity(c.parts, b.variability);
   int robotComplexity = genRobotComplexity(c.parts, parts);
 
-  cout << "Robot variability: " << robotVariability << endl;
-  cout << "Robot Complexity: " << robotComplexity << "\n" << endl;
+  printAndWrite("Overall robot variability: " + to_string(robotVariability), outfile);
+  printAndWrite("Overall robot complexity: " + to_string(robotComplexity), outfile);
 
   bool buildNotSuccess = true;
   int attemptCountOffset = 0;
 
-  while(buildNotSuccess){
-    if(attemptCountOffset == 5){
-      cout << "attempting the build second time." << endl;
+  while(buildNotSuccess){        //loop keeps running untill build successeds
 
-    }
-    if(attemptCountOffset == 10){
-      cout << "attempting the build third time." << endl;
-    }
+    if(attemptCountOffset == 5) printAndWrite("attempting the build second time", outfile);
+    if(attemptCountOffset == 10) printAndWrite("attempting the build third time", outfile);
 
     int randomValue = genNormalRandomValue(b.ability, robotVariability);
-    cout << "Normal random value: " << randomValue << endl;
+    printAndWrite("Normal random value: " + to_string(randomValue), outfile);
 
     if(isBuildSuccessful(randomValue + attemptCountOffset, robotComplexity)){
-      cout << "build successful" << endl;
-      buildNotSuccess = false;
+      printAndWrite("build successful", outfile);
+      buildNotSuccess = false;        //now build completed. So, buildNotSuccess = false stops while loop 
     }
     else{
-      cout << "build failed" << endl;
+      printAndWrite("build failed", outfile);
       attemptCountOffset += 5;
-      if(attemptCountOffset > 10) buildNotSuccess = false;
+      if(attemptCountOffset > 10) buildNotSuccess = false;        //forcefully stops build loop, because 3 attempts done
     }
   }
 }
