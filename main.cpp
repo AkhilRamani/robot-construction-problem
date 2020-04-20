@@ -1,32 +1,31 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <fstream>
 using namespace std;
 #include "implementation.h"
 
 
 int main() {
 
-  cout << endl << "=== CUSTOMER DATA ===" << endl;
+  cout << "\nReading data from file\n" << "--------------------------" << endl;
   vector<customer> customers = getCustomerData("Customers.txt");
-  for(auto c:customers)
-    cout << c.name << " " << c.order << " " << c.parts << endl;
-
-
-  cout << endl << "=== BUILDER DATA ===" << endl;
   vector<builder> builders = getBuilderData("Builders.txt");
-  for(auto b: builders)
-    cout << b.name << "  " << b.ability << "  " << b.variability << endl;
-
-  cout << endl << "=== PARTS DATA ===" << endl;
   vector<part> parts = getPartData("Parts.txt");
-  for(auto p:parts)
-    cout << p.code << "  " << p.name << "  " << p.min << "  " << p.max << "  " << p.complexity << endl;
 
-  cout << endl << "random no: " << genRandomNo() << endl;
+  // ofstream outFile;
+  // outFile.open("Output.txt", ios::trunc);
 
-  int robotComplexity = genRobotComplexity(customers[3].parts, parts);
-  cout << "Robot complexity: " << robotComplexity << endl;
+  cout << "\n\nStarting the processing customer orders\n" << "---------------------------------------" << endl;
+  for (auto c : customers){
+    int randomN0 = genRandomNo();
+    builder selectedBuilder = builders[randomN0];
+
+    cout << "\nProcessing customer: " << c.name << "\nOrder: " << c.order << "\nbuilder assigned: " << selectedBuilder.name << endl;
+
+    build(selectedBuilder, c, parts);
+    cout << "-----\n" << endl;
+  }
 
   return 0;
 }
